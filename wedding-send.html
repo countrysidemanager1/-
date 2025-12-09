@@ -43,7 +43,7 @@
   <div id="backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal" role="document">
       <h2 id="modalTitle">송금 방법 선택</h2>
-      <p class="small">원하시는 방법을 탭하세요. (우리은행 1002-049-777810.)</p>
+      <p class="small">원하시는 방법을 탭하세요.</p>
 
       <!-- 1. 은행 계좌 복사 -->
       <div class="option" id="bankOption">
@@ -57,31 +57,7 @@
                  </div>
       </div>
 
-      <!-- 2. 간편결제 링크 -->
-      <div class="option" id="payOption">
-        <div>
-          <strong>간편결제 바로가기</strong>
-          <div class="small">Toss / KakaoPay 등 모바일 결제 앱으로 연결</div>
-        </div>
-        <div>
-          <button class="open-btn" id="openPay">결제 앱 열기</button>
-        </div>
-      </div>
-
-      <!-- 3. QR 코드 -->
-      <div class="option" style="flex-direction:column;align-items:flex-start">
-        <strong>QR 코드로 송금</strong>
-        <div class="qr-wrap" style="margin-top:10px">
-          <div class="qr-placeholder" id="qrImg">QR 이미지</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div class="small">QR을 길게 눌러 저장 후 결제 앱에서 불러오세요.</div>
-            <div>
-              <button class="qr-download" id="downloadQr">QR 저장</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
         <button id="closeModal" class="open-btn" style="background:#e5e7eb;color:#111">닫기</button>
       </div>
@@ -163,4 +139,5 @@
   </script>
 </body>
 </html>
+
 
