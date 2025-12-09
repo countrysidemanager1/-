@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>모바일 청첩장 - 송금하기 버튼 (샘플)</title>
+  <style>
+    :root{--bg:#f8fafc;--primary:#ff6b6b;--card:#ffffff;--muted:#6b7280}
+    html,body{height:100%;margin:0;font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;background:var(--bg);color:#111}
+    .wrap{max-width:480px;margin:28px auto;padding:16px}
+    .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(15,23,42,0.06)}
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 14px;color:var(--muted)}
+    .send-btn{display:inline-block;width:100%;padding:14px 18px;border-radius:12px;background:linear-gradient(90deg,var(--primary),#ff8a8a);color:#fff;font-weight:700;font-size:16px;text-align:center;border:0;cursor:pointer}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal{width:100%;max-width:420px;border-radius:14px;background:#fff;padding:16px}
+    .modal h2{margin:0 0 6px;font-size:18px}
+    .option{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:10px;border:1px solid #f0f0f0;margin:10px 0}
+    .option strong{display:block}
+    .small{font-size:13px;color:var(--muted)}
+    .copy-btn, .open-btn, .qr-download{padding:8px 10px;border-radius:10px;border:0;background:#111;color:#fff;font-weight:600;cursor:pointer}
+    .acct{word-break:break-all;font-weight:600}
+    .qr-wrap{display:flex;gap:12px;align-items:center}
+    .qr-placeholder{width:110px;height:110px;border-radius:8px;background:linear-gradient(180deg,#f7f7f8,#ededf0);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+    .note{font-size:13px;color:var(--muted);margin-top:8px}
+
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <!-- 이미지 제거됨 -->
+      <h1>배재익 &amp; 주윤솔 결혼식에 오신 것을 환영합니다</h1>
+      <p class="lead">축하해 주시는 마음만으로도 감사합니다.</p>
+      <button id="openSend" class="send-btn">송금하기</button>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <h2 id="modalTitle">송금 방법 선택</h2>
+      <p class="small">원하시는 방법을 탭하세요. (계좌번호나 링크는 샘플입니다. 실제 정보로 바꿔주세요.)</p>
+
+      <!-- 1. 은행 계좌 복사 -->
+      <div class="option" id="bankOption">
+        <div>
+          <strong>은행 계좌로 송금</strong>
+          <div class="small">예금주: 주홍운</div>
+          <div class="acct" id="accountNumber">우리은행 1002-049-777810</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="copy-btn" id="copyAcct">계좌 복사</button>
+          <button class="open-btn" id="openBank">은행앱 열기</button>
+        </div>
+      </div>
+
+      <!-- 2. 간편결제 링크 -->
+      <div class="option" id="payOption">
+        <div>
+          <strong>간편결제 바로가기</strong>
+          <div class="small">Toss / KakaoPay 등 모바일 결제 앱으로 연결</div>
+        </div>
+        <div>
+          <button class="open-btn" id="openPay">결제 앱 열기</button>
+        </div>
+      </div>
+
+      <!-- 3. QR 코드 -->
+      <div class="option" style="flex-direction:column;align-items:flex-start">
+        <strong>QR 코드로 송금</strong>
+        <div class="qr-wrap" style="margin-top:10px">
+          <div class="qr-placeholder" id="qrImg">QR 이미지</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="small">QR을 길게 눌러 저장 후 결제 앱에서 불러오세요.</div>
+            <div>
+              <button class="qr-download" id="downloadQr">QR 저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal" class="open-btn" style="background:#e5e7eb;color:#111">닫기</button>
+      </div>
+
+      <p class="note">참고: 실제 송금 전 계좌 정보가 정확한지 다시 확인해주세요.</p>
+    </div>
+  </div>
+
+  <script>
+    const SETTING = {
+      accountText: '우리은행 1002-049-777810(주홍운)',
+      webPaymentUrl: 'https://example.com/your-payment-page',
+      appScheme: '',
+      qrImageUrl: ''
+    };
+
+    const backdrop = document.getElementById('backdrop');
+    const openSend = document.getElementById('openSend');
+    const closeModal = document.getElementById('closeModal');
+    const accountNumber = document.getElementById('accountNumber');
+    const copyAcct = document.getElementById('copyAcct');
+    const openBank = document.getElementById('openBank');
+    const openPay = document.getElementById('openPay');
+    const qrImg = document.getElementById('qrImg');
+    const downloadQr = document.getElementById('downloadQr');
+
+    accountNumber.textContent = SETTING.accountText;
+    if (SETTING.qrImageUrl) {
+      qrImg.style.backgroundImage = `url('${SETTING.qrImageUrl}')`;
+      qrImg.style.backgroundSize = 'cover';
+      qrImg.textContent = '';
+    }
+
+    openSend.addEventListener('click', () => {
+      backdrop.style.display = 'flex';
+      document.getElementById('modalTitle').focus?.();
+    });
+
+    closeModal.addEventListener('click', () => { backdrop.style.display = 'none'; });
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.style.display = 'none'; });
+
+    copyAcct.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(SETTING.accountText);
+        copyAcct.textContent = '복사됨 ✓';
+        setTimeout(() => copyAcct.textContent = '계좌 복사', 1800);
+      } catch (err) {
+        alert('복사할 수 없습니다. 수동으로 계좌를 복사해 주세요.');
+      }
+    });
+
+    openBank.addEventListener('click', () => {
+      if (SETTING.appScheme) {
+        window.location.href = SETTING.appScheme;
+        setTimeout(() => { window.location.href = SETTING.webPaymentUrl }, 1500);
+      } else {
+        window.open(SETTING.webPaymentUrl, '_blank');
+      }
+    });
+
+    openPay.addEventListener('click', () => {
+      window.open(SETTING.webPaymentUrl, '_blank');
+    });
+
+    downloadQr.addEventListener('click', () => {
+      if (SETTING.qrImageUrl) {
+        const a = document.createElement('a');
+        a.href = SETTING.qrImageUrl;
+        a.download = 'payment-qr.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else {
+        alert('QR 이미지가 설정되어 있지 않습니다.');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') backdrop.style.display = 'none'; });
+  </script>
+</body>
+</html>
